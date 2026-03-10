@@ -7,6 +7,7 @@ use App\Http\Controllers\PortalController;
 use App\Http\Controllers\Admin\DocumentoController;
 use App\Http\Controllers\Admin\SubcategoriaController;
 use App\Http\Controllers\Admin\MesController;
+use App\Http\Controllers\ChatbotController;
 
 Route::middleware(['auth', 'verified'])->group(function () {
 
@@ -34,4 +35,4 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

@@ -1,10 +1,10 @@
 @extends('layouts.app')
-@section('title', 'Subir Documento')
+@section('title', 'Subir Documentos')
 
 @section('breadcrumb')
     <li class="breadcrumb-item"><a href="{{ route('portal.index') }}">Inicio</a></li>
     <li class="breadcrumb-item"><a href="{{ route('admin.documentos.index') }}">Gestión</a></li>
-    <li class="breadcrumb-item active">Subir Documento</li>
+    <li class="breadcrumb-item active">Subir Documentos</li>
 @endsection
 
 @section('content')
@@ -13,7 +13,7 @@
         <div class="col-lg-8">
             <div class="card border-0 shadow-sm">
                 <div class="card-header py-3" style="background:var(--ccv-primary);color:white;">
-                    <h5 class="mb-0">➕ Subir nuevo documento</h5>
+                    <h5 class="mb-0">➕ Subir nuevo documentos</h5>
                 </div>
                 <div class="card-body p-4">
                     <form action="{{ route('admin.documentos.store') }}" method="POST" enctype="multipart/form-data">

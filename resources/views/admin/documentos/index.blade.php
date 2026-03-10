@@ -12,7 +12,7 @@
         <h4 class="fw-bold mb-0" style="color:var(--ccv-primary);">⚙️ Gestión de Documentos</h4>
         <a href="{{ route('admin.documentos.create') }}" class="btn"
             style="background:var(--ccv-accent);color:#333;font-weight:600;">
-            ➕ Subir nuevo documento
+            ➕ Subir nuevo documentos
         </a>
     </div>
 

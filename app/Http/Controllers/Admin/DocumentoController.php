@@ -30,40 +30,44 @@ class DocumentoController extends Controller
 
     public function store(Request $request)
     {
-        
         $request->validate([
             'titulo'          => 'required|max:255',
             'categoria_id'    => 'required|exists:categorias,id',
             'subcategoria_id' => 'required|exists:subcategorias,id',
             'mes_id'          => 'required|exists:meses,id',
-            'archivo'         => 'required|file|mimes:pdf,doc,docx,xls,xlsx|max:20480',
-            'fecha_documento' => 'nullable|date',
-            'numero_documento'=> 'nullable|max:100',
-            'descripcion'     => 'nullable|max:1000',
+
+            'archivos'        => 'required|array|min:1',
+            'archivos.*'      => 'file|mimes:pdf,doc,docx,xls,xlsx|max:20480',
+
+            'fecha_documento'  => 'nullable|date',
+            'numero_documento' => 'nullable|max:100',
+            'descripcion'      => 'nullable|max:1000',
         ]);
 
-        $archivo = $request->file('archivo');
-        $path    = $archivo->store('documentos', 'public');
+        foreach ($request->file('archivos') as $archivo) {
+            $path = $archivo->store('documentos', 'public');
 
-        Documento::create([
-            'titulo'           => $request->titulo,
-            'slug'             => Str::slug($request->titulo) . '-' . time(),
-            'categoria_id'     => $request->categoria_id,
-            'subcategoria_id'  => $request->subcategoria_id,
-            'mes_id'           => $request->mes_id,
-            'user_id'          => auth()->id(),
-            'descripcion'      => $request->descripcion,
-            'numero_documento' => $request->numero_documento,
-            'fecha_documento'  => $request->fecha_documento,
-            'archivo_path'     => $path,
-            'archivo_nombre'   => $archivo->getClientOriginalName(),
-            'archivo_tipo'     => $archivo->getClientOriginalExtension(),
-            'archivo_tamaño'   => $archivo->getSize(),
-            'estado'           => 'activo',
-        ]);
+            $doc = Documento::create([
+                'titulo'           => $request->titulo,
+                'slug'             => Str::slug($request->titulo) . '-' . time() . '-' . Str::random(6),
+                'categoria_id'     => $request->categoria_id,
+                'subcategoria_id'  => $request->subcategoria_id,
+                'mes_id'           => $request->mes_id,
+                'user_id'          => auth()->id(),
+                'descripcion'      => $request->descripcion,
+                'numero_documento' => $request->numero_documento,
+                'fecha_documento'  => $request->fecha_documento,
+                'archivo_path'     => $path,
+                'archivo_nombre'   => $archivo->getClientOriginalName(),
+                'archivo_tipo'     => $archivo->getClientOriginalExtension(),
+                'archivo_tamaño'   => $archivo->getSize(),
+                'estado'           => 'activo',
+            ]);
+            \App\Jobs\IndexDocumentoRag::dispatch($doc->id);
+        }
 
         return redirect()->route('admin.documentos.index')
-            ->with('success', 'Documento subido exitosamente.');
+            ->with('success', 'Documento(s) subido(s) exitosamente.');
     }
 
     public function edit(Documento $documento)
@@ -79,14 +83,18 @@ class DocumentoController extends Controller
             'categoria_id'    => 'required|exists:categorias,id',
             'archivo'         => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx|max:20480',
             'fecha_documento' => 'nullable|date',
-            'numero_documento'=> 'nullable|max:100',
+            'numero_documento' => 'nullable|max:100',
             'descripcion'     => 'nullable|max:1000',
             'estado'          => 'required|in:activo,inactivo,archivado',
         ]);
 
         $data = $request->only([
-            'titulo', 'categoria_id', 'descripcion',
-            'numero_documento', 'fecha_documento', 'estado'
+            'titulo',
+            'categoria_id',
+            'descripcion',
+            'numero_documento',
+            'fecha_documento',
+            'estado'
         ]);
 
         if ($request->hasFile('archivo')) {
